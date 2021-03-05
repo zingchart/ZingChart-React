@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import constants from 'zingchart-constants';
+import Dompurify from "dompurify";
+import zingchart from "zingchart";
+
 
 const { DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_OUTPUT, EVENT_NAMES, METHOD_NAMES } = constants;
 
@@ -33,6 +36,27 @@ class ZingChart extends Component {
     return (
       <div id={this.id} style={this.state.style}></div>
     );
+  }
+
+  sanitizeStrings(strings) {
+    return strings.map((str) => Dompurify.sanitize(str));
+  }
+
+  sanitizeSeries(series) {
+    return (series || []).map((ser) => ({
+      ...(ser || {}),
+      values: this.sanitizeStrings(((ser || {}).values || [])),
+    }));
+  }
+
+  sanitize(data) {
+    const { series } = data;
+    const sanitized = this.sanitizeSeries(series);
+    const clean = {
+      ...data,
+      series: sanitized,
+    };
+    return clean;
   }
 
   componentDidMount() {
@@ -92,7 +116,7 @@ class ZingChart extends Component {
     renderObject.id = this.id;
     renderObject.width = this.props.width || DEFAULT_WIDTH;
     renderObject.height = this.props.height || DEFAULT_HEIGHT;
-    renderObject.data = this.props.data;
+    renderObject.data = this.sanitize(this.props.data);
     renderObject.output = this.props.output || DEFAULT_OUTPUT;
 
     if (this.props.series) {

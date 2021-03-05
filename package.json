@@ -76,6 +76,7 @@
     "dist"
   ],
   "dependencies": {
+    "dompurify": "^2.2.2",
     "zingchart": "latest",
     "zingchart-constants": "github:zingchart/zingchart-constants#master"
   },
